@@ -119,6 +119,48 @@ const buildGuardrailPrompt = (matrixSummary: string, context: string): string =>
     ].join('\n');
 };
 
+const buildMatrixNarrative = (matrix: StrategicMatrix): string => {
+    const describeBlock = (label: string, block: CanvasBlock | SwotBlock) => {
+        const highlights = (block.items || [])
+            .map(item => item.item || item.description)
+            .filter(Boolean)
+            .slice(0, 3);
+        if (highlights.length === 0) return '';
+        return `${label}: ${highlights.join('; ')}`;
+    };
+
+    const canvasParts = [
+        describeBlock('Segmentos priorizados', matrix.customerSegments),
+        describeBlock('Proposta de valor e diferenciais', matrix.valueProposition),
+        describeBlock('Canais e relacionamento', matrix.channels),
+        describeBlock('Receitas e monetização', matrix.revenueStreams),
+        describeBlock('Recursos e atividades-chave', matrix.keyResources),
+        describeBlock('Parcerias estratégicas', matrix.keyPartnerships),
+        describeBlock('Estrutura de custos', matrix.costStructure),
+    ].filter(Boolean);
+
+    const swotParts = [
+        describeBlock('Forças', matrix.swot.strengths),
+        describeBlock('Fraquezas', matrix.swot.weaknesses),
+        describeBlock('Oportunidades', matrix.swot.opportunities),
+        describeBlock('Ameaças', matrix.swot.threats),
+    ].filter(Boolean);
+
+    const narrativeParts = [] as string[];
+
+    if (canvasParts.length > 0) {
+        narrativeParts.push('Referências estratégicas consideradas na análise:');
+        narrativeParts.push(canvasParts.join('\n'));
+    }
+
+    if (swotParts.length > 0) {
+        narrativeParts.push('Pontos de atenção identificados no SWOT:');
+        narrativeParts.push(swotParts.join('\n'));
+    }
+
+    return narrativeParts.join('\n\n');
+};
+
 const extractNumericSignalsFromMatrix = (matrix: StrategicMatrix): number[] => {
     const numbers: number[] = [];
     const blocks: (CanvasBlock | SwotBlock)[] = [
@@ -270,9 +312,6 @@ const generateCanvasBlock = (context: string, type: keyof StrategicMatrix): Canv
 };
 
 
-// FIX: Lógica de geração de conteúdo completamente refeita.
-// Agora, ela usa as diretrizes do `generationGuidelines.ts` para
-// criar um texto específico e estruturado para cada seção.
 const generateRealisticSectionText = (
     sectionId: string,
     description: string,
@@ -302,6 +341,14 @@ const generateRealisticSectionText = (
         return content;
     }
 
+    const buildNarrativeFromChunks = (chunks: string[]): string => {
+        if (chunks.length === 0) return '';
+        if (chunks.length === 1) return chunks[0];
+        const [first, ...rest] = chunks;
+        const additional = rest.map(chunk => `Além disso, ${chunk}`).join(' ');
+        return `${first} ${additional}`;
+    };
+
     // Lógica padrão para diretrizes estruturadas
     let content = `### Análise Consolidada\n\nCom base na diretriz de "${description}", este tópico detalha a ${guidelines.title.toLowerCase()} do projeto, alinhada às exigências do SEBRAE e do BRDE.\n\n`;
 
@@ -319,14 +366,14 @@ const generateRealisticSectionText = (
             // fixing the "Unterminated group" crash.
             const cleanReq = req.replace(/[().,]/g, '');
             const keywords = (guidelines.keywords || []).concat(cleanReq.split(/\s+/).filter(w => w.length > 4));
-            const chunks = extractRelevantChunks(context, keywords, 2);
-            
+            const chunks = extractRelevantChunks(context, keywords, 3);
+
+            sectionContent += `**${req}**\n\n`;
+
             if (chunks.length > 0) {
-                sectionContent += `**${req}**\n\n`;
-                sectionContent += chunks.map(chunk => `- ${chunk}`).join('\n');
-                sectionContent += '\n\n';
+                const paragraph = buildNarrativeFromChunks(chunks);
+                sectionContent += `${paragraph}\n\n`;
             } else {
-                sectionContent += `**${req}**\n\n`;
                 sectionContent += `[INFORMAÇÃO PENDENTE: A IA não encontrou dados explícitos sobre este requisito no contexto fornecido. É crucial adicionar informações, citando pesquisas, dados internos ou fontes externas para validar este ponto.]\n\n`;
             }
         });
@@ -517,15 +564,15 @@ export const generateSectionContent = async (
         return `### Pré-requisito ausente\n\n${matrixValidation.reason}\n\nA geração desta seção está bloqueada até que a Matriz Estratégica esteja disponível e válida.`;
     }
 
-    const matrixSummary = buildMatrixPromptSummary(matrix);
-    const guardedContext = buildGuardrailPrompt(matrixSummary, context);
+    const matrixNarrative = buildMatrixNarrative(matrix);
+    const narrativeContext = [context, matrixNarrative].filter(hasContent).join('\n\n');
 
     // A lógica de refinamento pode ser mais complexa, mas por enquanto, vamos focar na geração inicial correta.
     if (refinementInput.trim()) {
         const refinedText = `${currentContent}\n\n### Refinamento com Base em: "${refinementInput}"\n\nA IA analisou sua instrução e adicionou a seguinte informação para complementar a análise: [... detalhes adicionados aqui...]`;
         return refinedText;
     }
-    return generateRealisticSectionText(sectionId, sectionDescription, guardedContext);
+    return generateRealisticSectionText(sectionId, sectionDescription, narrativeContext || context);
 };
 
 
