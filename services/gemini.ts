@@ -204,24 +204,37 @@ const extractNumericSignalsFromMatrix = (matrix: StrategicMatrix): number[] => {
 // Helper to find relevant chunks/paragraphs based on keywords
 const extractRelevantChunks = (text: string, keywords: string[], maxCount = 5): string[] => {
     if (!text || !keywords || keywords.length === 0) return [];
-    
+
     // FIX: Split by one or more newlines to handle bullet points and paragraphs.
-    const chunks = text.split(/[\r\n]+/).filter(chunk => chunk.trim() !== ''); 
+    const chunks = text.split(/[\r\n]+/).filter(chunk => chunk.trim() !== '');
     const relevantChunks: string[] = [];
     const lowerCaseKeywords = keywords.map(k => k.toLowerCase());
 
-    for (const chunk of chunks) {
+    for (const rawChunk of chunks) {
         if (relevantChunks.length >= maxCount) break;
-        
+
         // Clean up common system markers and trim whitespace, including list prefixes
-        const trimmedChunk = chunk.trim().replace(/--- (Página|ARQUIVO).*? ---/g, '').replace(/^-|^\d\.\s*/, '').trim();
-        
+        const trimmedChunk = rawChunk
+            .trim()
+            .replace(/--- (Página|ARQUIVO).*? ---/g, '')
+            .replace(/^-|^\d\.\s*/, '')
+            .replace(/-- IN[IÍ]CIO DO CONTEXTO DO PROJETO PADR[AÃ]O.*?---/gi, '')
+            .replace(/-- FIM DO CONTEXTO DO PROJETO PADR[AÃ]O.*?---/gi, '')
+            .replace(/10\. CONCLUS[AÃ]O E S[IÍ]NTESE FINAL .*?/gi, '')
+            .replace(/CEN[AÁ]RIO DEFINITIVO SCINE/gi, '')
+            .trim();
+
+        // Skip system/boilerplate lines that pollute outputs
+        if (/IN[IÍ]CIO DO CONTEXTO DO PROJETO PADR[AÃ]O|FIM DO CONTEXTO DO PROJETO PADR[AÃ]O|CONCLUS[AÃ]O E S[IÍ]NTESE FINAL|CONTEXTO DO NEG[ÓO]CIO/gi.test(rawChunk)) {
+            continue;
+        }
+
         // Increased min length to catch more meaningful lines and filter out noise
-        if (trimmedChunk.length < 20 || trimmedChunk.length > 2000) continue; 
+        if (trimmedChunk.length < 20 || trimmedChunk.length > 2000) continue;
 
         // Use a more flexible regex to account for multiple spaces or different word orders in some cases
         const hasKeyword = lowerCaseKeywords.some(keyword => new RegExp(`\\b${keyword.replace(/ /g, '\\s*')}\\b`, 'i').test(trimmedChunk));
-        
+
         if (hasKeyword && !relevantChunks.includes(trimmedChunk)) {
             relevantChunks.push(trimmedChunk);
         }
@@ -324,33 +337,115 @@ const generateRealisticSectionText = (
         return `### Análise Preliminar\n\n[Diretrizes de geração para a seção ${sectionId} não encontradas. A IA usará uma abordagem genérica.]\n\nConsiderando a diretriz de "${description}", a análise do contexto indica a necessidade de detalhar os seguintes pontos: [...]\n`;
     }
 
-    // FEATURE: Lógica especial para roteiros de alta fidelidade
-    if (guidelines.fullPrompt) {
-        const promptKeywords = ['demanda', 'risco', 'projeções', 'cliente', 'concorrência', 'tendências', 'mercado', 'financeiro', 'sebrae', 'brde'];
-        const chunks = extractRelevantChunks(context, promptKeywords, 5);
-
-        let content = `### Análise Consolidada - ${guidelines.title}\n\n`;
-        content += `A Análise de Mercado é um componente crítico deste plano de negócios, servindo para validar a demanda, reduzir a percepção de risco para financiadores como o BRDE, e fornecer uma base sólida para as projeções financeiras e decisões estratégicas.\n\n`;
-        content += `Nos capítulos seguintes, serão analisadas em detalhe as dimensões essenciais do mercado, incluindo a segmentação e o perfil dos clientes (2.1, 2.2), as necessidades e oportunidades (2.3), a quantificação do mercado potencial (2.5), a análise da concorrência (2.6) e as tendências e riscos setoriais (2.7-2.11).\n\n`;
-        
-        if (chunks.length > 0) {
-            content += `Esta análise foi construída com base em pesquisas primárias realizadas com o público-alvo, estudos de mercado secundários e análises internas estratégicas. As conclusões aqui apresentadas fornecem o embasamento para o Plano de Marketing e são diretamente conectadas às projeções de assinantes e receita do Plano Financeiro.\n\n`;
-        } else {
-             content += `[INFORMAÇÃO PENDENTE: Embora a estrutura da análise esteja definida, a IA não encontrou dados de suporte suficientes no contexto (pesquisas, análises de mercado) para aprofundar esta introdução. É crucial adicionar estes documentos para validar as premissas.]\n`;
-        }
-        return content;
-    }
-
     const buildNarrativeFromChunks = (chunks: string[]): string => {
         if (chunks.length === 0) return '';
         if (chunks.length === 1) return chunks[0];
-        const [first, ...rest] = chunks;
-        const additional = rest.map(chunk => `Além disso, ${chunk}`).join(' ');
-        return `${first} ${additional}`;
+        return chunks
+            .map((chunk, index) => (index === 0 ? chunk : `- ${chunk}`))
+            .join('\n\n');
     };
+
+    const deriveKeywordsFromPrompt = (prompt: string): string[] => {
+        const words = prompt
+            .toLowerCase()
+            .split(/[^a-zà-ú0-9]+/i)
+            .filter(word => word.length > 4 && !['brde', 'sebrae'].includes(word));
+        return Array.from(new Set(words)).slice(0, 25);
+    };
+
+    const extractRequirementsFromPrompt = (prompt: string, marker: string): string[] => {
+        const lines = prompt.split('\n').map(line => line.trim());
+        const startIndex = lines.findIndex(line => line.toLowerCase().includes(marker.toLowerCase()));
+        if (startIndex === -1) return [];
+
+        const requirements: string[] = [];
+        for (let i = startIndex + 1; i < lines.length; i++) {
+            const line = lines[i];
+            const isNextNumberedSection = /^\d+\./.test(line);
+            if (isNextNumberedSection) break;
+
+            if (line.startsWith('-')) {
+                requirements.push(line.replace(/^-\s*/, '').replace(/\s+\.$/, ''));
+            }
+        }
+        return requirements;
+    };
+
+    const keywordPool = (guidelines.keywords || []).concat(
+        guidelines.fullPrompt ? deriveKeywordsFromPrompt(guidelines.fullPrompt) : []
+    );
+
+    const sebraeRequirements =
+        guidelines.sebrae && guidelines.sebrae.length > 0
+            ? guidelines.sebrae
+            : guidelines.fullPrompt
+              ? extractRequirementsFromPrompt(guidelines.fullPrompt, 'exigências sebrae')
+              : [];
+
+    const brdeRequirements =
+        guidelines.brde && guidelines.brde.length > 0
+            ? guidelines.brde
+            : guidelines.fullPrompt
+              ? extractRequirementsFromPrompt(guidelines.fullPrompt, 'exigências brde')
+              : [];
+
+    // FEATURE: Lógica especial para roteiros de alta fidelidade
+    if (guidelines.fullPrompt) {
+        const promptKeywords = keywordPool.length > 0 ? keywordPool : ['mercado', 'segmento', 'cliente', 'concorrência'];
+        const usedPromptChunks = new Set<string>();
+        const chunks = extractRelevantChunks(context, promptKeywords, 6).filter(chunk => {
+            const normalized = chunk.toLowerCase();
+            if (usedPromptChunks.has(normalized)) return false;
+            usedPromptChunks.add(normalized);
+            return true;
+        });
+
+        let content = `### Análise Consolidada - ${guidelines.title}\n\n`;
+        if (chunks.length > 0) {
+            content += `${buildNarrativeFromChunks(chunks)}\n\n`;
+        } else {
+            content += `[INFORMAÇÃO PENDENTE: A IA não encontrou evidências suficientes no contexto e nos anexos para sustentar a narrativa deste tópico. Adicione pesquisas, dados ou respostas do usuário para cobrir as exigências do roteiro completo.]\n\n`;
+        }
+
+        const generateSection = (title: string, requirements: string[] | undefined) => {
+            if (!requirements || requirements.length === 0) return '';
+
+            let sectionContent = `#### ${title}\n\n`;
+            requirements.forEach(req => {
+                const cleanReq = req.replace(/[().,]/g, '');
+                const keywords = keywordPool.concat(cleanReq.split(/\s+/).filter(w => w.length > 4));
+                const reqChunks = extractRelevantChunks(context, keywords, 4).filter(chunk => {
+                    const normalized = chunk.toLowerCase();
+                    if (usedPromptChunks.has(normalized)) return false;
+                    usedPromptChunks.add(normalized);
+                    return true;
+                });
+
+                sectionContent += `**${req}**\n\n`;
+
+                if (reqChunks.length > 0) {
+                    const paragraph = buildNarrativeFromChunks(reqChunks);
+                    sectionContent += `${paragraph}\n\n`;
+                } else {
+                    sectionContent += `[INFORMAÇÃO PENDENTE: A IA não encontrou dados explícitos sobre este requisito no contexto fornecido. É crucial adicionar informações, citando pesquisas, dados internos ou fontes externas para validar este ponto.]\n\n`;
+                }
+            });
+
+            return sectionContent;
+        };
+
+        content += generateSection('Análise Conforme Requisitos SEBRAE', sebraeRequirements);
+        content += generateSection('Análise Conforme Requisitos BRDE', brdeRequirements);
+
+        content += `### Conclusão da Seção\n\nA análise detalhada, seguindo os critérios estabelecidos, busca fornecer uma visão completa e transparente sobre a ${guidelines.title.toLowerCase()}, mitigando riscos e fortalecendo a tese de investimento do projeto.`;
+
+        return content;
+    }
 
     // Lógica padrão para diretrizes estruturadas
     let content = `### Análise Consolidada\n\nCom base na diretriz de "${description}", este tópico detalha a ${guidelines.title.toLowerCase()} do projeto, alinhada às exigências do SEBRAE e do BRDE.\n\n`;
+
+    const usedChunks = new Set<string>();
 
     const generateSection = (title: string, requirements: string[] | undefined) => {
         if (!requirements) return '';
@@ -365,8 +460,13 @@ const generateRealisticSectionText = (
             // This prevents invalid characters like '(' from being passed into the RegExp constructor,
             // fixing the "Unterminated group" crash.
             const cleanReq = req.replace(/[().,]/g, '');
-            const keywords = (guidelines.keywords || []).concat(cleanReq.split(/\s+/).filter(w => w.length > 4));
-            const chunks = extractRelevantChunks(context, keywords, 3);
+            const keywords = keywordPool.concat(cleanReq.split(/\s+/).filter(w => w.length > 4));
+            const chunks = extractRelevantChunks(context, keywords, 3).filter(chunk => {
+                const normalized = chunk.toLowerCase();
+                if (usedChunks.has(normalized)) return false;
+                usedChunks.add(normalized);
+                return true;
+            });
 
             sectionContent += `**${req}**\n\n`;
 
