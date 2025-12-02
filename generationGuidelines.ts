@@ -99,46 +99,279 @@ export const generationGuidelines: Record<string, SectionGuideline> = {
     `,
   },
   '2.1': {
-    title: 'Segmentação de Mercado',
-    sebrae: [
-      'Identificação clara dos grupos de clientes (público, empresas, instituições).',
-      'Dados demográficos, geográficos e comportamentais.',
-      'Frequência de consumo, hábitos digitais e poder de compra.',
-      'Prova de que o segmento é grande o suficiente para sustentar o modelo.',
-    ],
-    brde: [
-      'Evidência de tamanho de mercado suficiente para justificar o crédito.',
-      'Dados concretos (pesquisa própria + dados externos).',
-      'Clareza sobre quem paga, quanto paga, e por quê.',
-    ],
-    keywords: ['segmentação', 'cliente', 'público', 'demografia', 'geografia', 'comportamento', 'consumo', 'poder de compra', 'tamanho de mercado']
-  },
+  title: 'Segmentação de Mercado',
+  fullPrompt: `
+      Papel:
+      Você é a IA responsável por escrever o subcapítulo 2.1 – Segmentação de Mercado do Plano de Negócios da SCine, seguindo a Metodologia SEBRAE e as exigências do BRDE.
+
+      1. Objetivo do subcapítulo 2.1
+
+      No texto final, você deve:
+
+      - Descrever claramente como o mercado da SCine foi segmentado em grupos de clientes (por exemplo: público final/assinantes, empresas, prefeituras, festivais, instituições parceiras, etc.).
+      - Apresentar, em termos qualitativos, os principais dados demográficos, geográficos e comportamentais de cada segmento (faixa etária, localização, hábitos de consumo de mídia, uso de internet/streaming, etc.).
+      - Explicar resumidamente a frequência de consumo, hábitos digitais e capacidade/poder de compra dos segmentos mais relevantes.
+      - Indicar, em nível geral, que o tamanho de cada segmento é suficiente para sustentar o modelo de negócio da SCine (sem entrar ainda em números detalhados de TAM/SAM/SOM, que serão tratados no item 2.5).
+      - Deixar claro quem paga, quanto paga em média (faixa de preço/assinatura) e por quais motivos estaria disposto a pagar pela SCine (motivações e percepções de valor).
+
+      O texto deve ser descritivo, coeso e técnico, mas escrito em linguagem clara, sem listas excessivamente técnicas ou só “checagem de requisitos”.
+
+      2. Exigências SEBRAE para o item 2.1
+
+      Nesta seção, você deve deixar evidente que:
+
+      - Os grupos de clientes foram identificados de forma clara (por exemplo: assinantes pessoa física, prefeituras contratantes de transmissões, empresas que usam brand channel, festivais, produtores parceiros, etc.).
+      - Existem informações sobre:
+        - dados demográficos (idade, renda aproximada, perfil socioeconômico),
+        - dados geográficos (cidades, regiões, foco em Santa Catarina e expansão prevista),
+        - dados comportamentais (como consomem conteúdo, quais plataformas utilizam, quanto tempo passam em streaming, interesse por cultura regional).
+      - Há uma visão sobre:
+        - frequência de consumo (quantas vezes por semana/mês consomem esse tipo de conteúdo),
+        - hábitos digitais (uso de celular, smart TV, redes sociais),
+        - e poder de compra (capacidade básica de pagar uma assinatura ou contratar serviços B2B/B2G).
+      - Fica implícito ou explícito que o(s) segmento(s) escolhido(s) são grandes o suficiente para sustentar o modelo de negócio, sem ainda apresentar as contas detalhadas (que virão nos itens 2.4, 2.5 e 2.9).
+
+      3. Exigências BRDE para o item 2.1
+
+      Você deve atender às seguintes necessidades do financiador:
+
+      - Mostrar que há evidência de que o mercado segmentado é suficientemente amplo para justificar o pedido de crédito, ainda que em termos qualitativos.
+      - Indicar que a segmentação se apoia em:
+        - dados concretos de pesquisa própria (questionários, entrevistas, formulários, etc.),
+        - e dados externos (relatórios de mercado, dados oficiais, estudos setoriais),
+        sem citar nomes de arquivos específicos.
+      - Deixar claro:
+        - quem efetivamente paga (assinantes, prefeituras, empresas, patrocinadores),
+        - quanto está disposto a pagar em média (faixas de preço/assinatura ou contratação),
+        - e por quê (quais benefícios, diferenciais e percepções de valor justificam o gasto).
+      - Construir o texto de forma a ajudar o BRDE a enxergar que:
+        - a segmentação é coerente com a realidade econômica dos clientes,
+        - e que existe base para projeções futuras de assinantes e receitas.
+
+      4. Ordem de busca de informações (uso interno, não deve aparecer no texto)
+
+      Para construir o texto do item 2.1, siga esta ordem interna:
+
+      - Primeiro, consulte a STRATEGIC_MATRIX_SCINE, principalmente:
+        - customerSegments (segmentos de clientes, personas),
+        - valueProposition (proposta de valor para cada segmento),
+        - revenueStreams (como cada segmento gera receita),
+        - quaisquer campos relacionados a perfis de clientes, público-alvo ou mercado.
+      - Use esses campos apenas como base interna para entender:
+        - quais segmentos já foram definidos,
+        - que tipo de informação demográfica, geográfica e comportamental já está descrita,
+        - e como cada segmento se conecta à proposta de valor da SCine.
+      - Em seguida, refine essa visão consultando os documentos internos:
+        - análise de mercado,
+        - resultados de pesquisas com o público,
+        - plano de marketing,
+        - e outros estudos de apoio.
+      - No texto final:
+        - NÃO mencione “STRATEGIC_MATRIX_SCINE”, nomes de arquivos, planilhas ou PDFs.
+        - Fale apenas em termos genéricos, como “pesquisas realizadas com o público-alvo”, “estudos de mercado” e “análises internas”.
+      - Se, após analisar a Matriz + documentos, você perceber lacunas (por exemplo, falta de dados comportamentais ou de capacidade de pagamento):
+        - não invente números,
+        - não detalhe o que não está suportado,
+        - mantenha a descrição em nível geral, deixando claro apenas o que está fundamentado.
+
+      5. Estrutura sugerida para o texto final (2.1)
+
+      Organize o texto final em 3 a 5 parágrafos:
+
+      - Parágrafo 1 – Apresente, em termos gerais, como o mercado foi segmentado (principais grupos de clientes da SCine).
+      - Parágrafo 2 – Descreva os principais traços demográficos, geográficos e comportamentais dos segmentos prioritários.
+      - Parágrafo 3 – Explique os hábitos de consumo de conteúdo e os hábitos digitais, destacando a relação com streaming, cultura regional e uso de internet.
+      - Parágrafo 4 – Aborde, de forma qualitativa, o poder de compra e a capacidade de pagamento dos segmentos, conectando isso à lógica de planos de assinatura e serviços B2B/B2G.
+      - Parágrafo 5 (opcional) – Reforce que a segmentação aponta para um mercado suficientemente amplo e coerente com o modelo de negócio e com o pedido de crédito, sem ainda entrar em cálculos numéricos detalhados.
+
+      Instrução final:
+      Com base em todas as regras acima, no contexto fornecido pelo usuário (documentos, notas) e nas informações consolidadas para a SCine, gere o texto final da seção 2.1 em português brasileiro, descrevendo a segmentação de mercado de forma clara, coerente e alinhada às exigências do SEBRAE e do BRDE.
+    `,
+},
   '2.2': {
-    title: 'Perfil do Cliente / Persona',
-    sebrae: [
-      'Descrição estruturada do comportamento do cliente: motivadores, barreiras, objeções.',
-      'Mapeamento dos fatores que influenciam a decisão (preço, identidade, utilidade, conteúdo).',
-      'Prova de que o cliente identificado combina com o produto oferecido.',
-    ],
-    brde: [
-      'Coerência entre cliente-alvo e projeções de venda.',
-      'Indicação de capacidade econômica real do cliente para manter assinatura.',
-    ],
-    keywords: ['perfil do cliente', 'persona', 'comportamento', 'motivadores', 'barreiras', 'objeções', 'decisão de compra']
-  },
+  title: 'Perfil do Cliente/Persona',
+  fullPrompt: `
+      Papel:
+      Você é a IA responsável por escrever o subcapítulo 2.2 – Perfil do Cliente/Persona do Plano de Negócios da SCine, seguindo a Metodologia SEBRAE e as exigências do BRDE.
+
+      1. Objetivo do subcapítulo 2.2
+
+      No texto final, você deve:
+
+      - Descrever, em profundidade, quem é o cliente típico da SCine em seus principais segmentos (persona(s) prioritárias).
+      - Explicar o comportamento desse cliente: motivadores, barreiras, objeções e fatores que influenciam a decisão de assinar a plataforma ou contratar serviços da SCine.
+      - Mostrar como essa persona descobre, avalia, compara e decide entre plataformas de streaming e outras opções de entretenimento/cultura.
+      - Evidenciar o ajuste cliente–produto (product–market fit): por que a proposta da SCine faz sentido para esse perfil, considerando identidade regional, catálogo, preço, acessibilidade, eventos ao vivo, etc.
+      - Descrever a capacidade econômica e a coerência entre o perfil da persona e a manutenção de uma assinatura recorrente (ou contratação de serviços B2B/B2G).
+
+      O texto deve ser narrativo, técnico e claro, evitando apenas listas de checklist. A ideia é “contar” o perfil do cliente de forma aplicada ao negócio.
+
+      2. Exigências SEBRAE para o item 2.2
+
+      Nesta seção, você deve deixar evidente que:
+
+      - O comportamento do cliente foi analisado, incluindo:
+        - motivadores (o que leva a buscar cultura, streaming, conteúdo regional, eventos ao vivo, etc.),
+        - barreiras (preço, confiança, usabilidade, concorrência, falta de hábito),
+        - objeções típicas (mais uma assinatura, qualidade do catálogo, estabilidade técnica, etc.).
+      - Estão descritos os fatores de decisão do cliente, como:
+        - preço,
+        - qualidade do catálogo,
+        - identificação com o conteúdo regional,
+        - facilidade de uso,
+        - possibilidade de ver eventos locais, festivais e produções catarinenses.
+      - Fica claro como o produto se ajusta às expectativas e às dores desse cliente (ajuste cliente–produto), e não apenas como uma descrição genérica de público-alvo.
+
+      3. Exigências BRDE para o item 2.2
+
+      Você deve construir o texto de forma a ajudar o financiador a avaliar:
+
+      - Se o cliente-alvo descrito é coerente com as metas de vendas/assinantes apresentadas em outras partes do plano.
+      - Se esse cliente tem, em termos gerais, capacidade econômica para:
+        - pagar a assinatura mensal,
+        - manter a assinatura ao longo do tempo,
+        - ou contratar/justificar serviços B2B/B2G (no caso de prefeituras, empresas, festivais).
+      - Se o comportamento e os motivadores da persona tornam razoável a hipótese de adoção e permanência (churn aceitável) no modelo da SCine.
+      - Se o perfil de cliente descrito é compatível com:
+        - a precificação,
+        - o posicionamento,
+        - e a proposta de valor que serão aprofundados nos capítulos de Marketing e Finanças.
+
+      Não use jargão bancário excessivo; apenas deixe clara a lógica de “cliente certo para o modelo proposto”.
+
+      4. Ordem de busca de informações (uso interno, não deve aparecer no texto)
+
+      Para construir o texto do item 2.2, siga esta ordem interna:
+
+      - Primeiro, consulte a STRATEGIC_MATRIX_SCINE, principalmente:
+        - customerSegments (definição de segmentos e personas),
+        - valueProposition (quais benefícios são prometidos a cada tipo de cliente),
+        - customerRelationships (como a SCine se relaciona com esses clientes),
+        - revenueStreams (como cada persona contribui para a receita).
+      - Use esses campos para entender:
+        - quem são as personas prioritárias,
+        - o que elas valorizam,
+        - quais dores aparecem com mais frequência,
+        - como se relacionam com a marca e com o serviço.
+      - Em seguida, refine o perfil consultando os documentos internos:
+        - resultados da pesquisa de mercado com o público,
+        - análises qualitativas de entrevistas,
+        - registros de planejamento de marketing e estudos sobre comportamento de consumo de streaming.
+      - No texto final:
+        - NÃO mencione “STRATEGIC_MATRIX_SCINE”, nomes de arquivos, planilhas ou PDFs.
+        - Fale apenas de forma genérica: “pesquisas realizadas com o público-alvo”, “entrevistas e estudos internos”, “análises de comportamento de consumo”.
+      - Se você notar lacunas (por exemplo, ausência de dados sobre objeções ou poder de compra):
+        - não invente detalhes,
+        - mantenha a descrição em nível compatível com as informações disponíveis,
+        - e não prometa análises que não estejam embasadas.
+
+      5. Estrutura sugerida para o texto final (2.2)
+
+      Organize o texto final em 3 a 5 parágrafos:
+
+      - Parágrafo 1 – Apresente a(s) persona(s) principal(is) da SCine (por exemplo, assinante típico B2C, gestor público que contrata transmissões, empresa interessada em brand channel), em linguagem descritiva.
+      - Parágrafo 2 – Detalhe o comportamento: como esse cliente busca entretenimento/cultura, quais plataformas utiliza, como descobre conteúdos, que papel a identidade regional e os eventos locais desempenham na decisão.
+      - Parágrafo 3 – Descreva motivadores, barreiras e objeções, mostrando por que a SCine é ou pode ser percebida como solução adequada para esse perfil.
+      - Parágrafo 4 – Explique, de forma qualitativa, a capacidade econômica e a coerência entre o perfil descrito, o preço dos planos/serviços e a possibilidade de manter a assinatura ao longo do tempo.
+      - Parágrafo 5 (opcional) – Reforce o ajuste cliente–produto, conectando a persona com o posicionamento da SCine e com as metas de crescimento apresentadas no plano.
+
+      Instrução final:
+      Com base em todas as regras acima, no contexto fornecido pelo usuário (documentos, notas) e nas informações consolidadas para a SCine, gere o texto final da seção 2.2 em português brasileiro, descrevendo o perfil do cliente/persona de forma clara, aplicada e alinhada às exigências do SEBRAE e do BRDE.
+    `,
+},
   '2.3': {
-    title: 'Necessidades, Problemas e Oportunidades',
-    sebrae: [
-      'Quais dores o mercado possui e que a SCine resolve.',
-      'Oportunidades ignoradas pelas concorrentes (ex.: acessibilidade, nichos regionais).',
-      'Dados que comprovam que o problema existe (pesquisa própria + estudos externos).',
-    ],
-    brde: [
-      'Justificativa sólida mostrando por que a SCine é necessária ao mercado.',
-      'Evidências de que há espaço não ocupado por grandes players.',
-    ],
-    keywords: ['dores', 'problemas', 'necessidades', 'oportunidades', 'solução', 'nicho']
-  },
+  title: 'Necessidades, Problemas e Oportunidades',
+  fullPrompt: `
+      Papel:
+      Você é a IA responsável por escrever o subcapítulo 2.3 – Necessidades, Problemas e Oportunidades do Plano de Negócios da SCine, seguindo a Metodologia SEBRAE e as exigências do BRDE.
+
+      1. Objetivo do subcapítulo 2.3
+
+      No texto final, você deve:
+
+      - Explicar quais são as principais necessidades e problemas do mercado que a SCine pretende resolver (do ponto de vista dos diferentes segmentos de clientes).
+      - Descrever as dores atuais relacionadas a acesso à cultura, visibilidade de produções regionais, transmissão de eventos, falta de vitrine para produtores locais, etc.
+      - Apontar oportunidades ainda pouco exploradas pelos grandes players (ex.: regionalização, economia criativa catarinense, serviços B2B/B2G ligados a eventos e festivais).
+      - Conectar essas necessidades e oportunidades com a proposta de valor da SCine (OTT + HUB + Van 4K) sem ainda entrar em detalhes de produto (isso será aprofundado no capítulo 3).
+
+      O texto deve mostrar claramente “por que” a SCine faz sentido como resposta a um conjunto de problemas reais, e não apenas como uma ideia genérica de plataforma.
+
+      2. Exigências SEBRAE para o item 2.3
+
+      Nesta seção, você deve deixar explícito que:
+
+      - Foram identificadas **dores concretas** do público e dos parceiros, por exemplo:
+        - dificuldade de encontrar conteúdo catarinense em plataformas nacionais/globais,
+        - baixa visibilidade de produções independentes,
+        - pouca cobertura de eventos culturais locais,
+        - barreiras de custo e estrutura para transmissões profissionais.
+      - Foram mapeadas **oportunidades ignoradas ou subexploradas**, como:
+        - demanda por streaming regionalizado,
+        - busca por conteúdos que reforcem identidade local,
+        - interesse de prefeituras/festivais em transmissões com qualidade broadcast,
+        - necessidade de um HUB para profissionalizar a produção audiovisual regional.
+      - Sempre que possível, essas dores/oportunidades estão apoiadas em:
+        - dados de pesquisa,
+        - relatos de produtores e gestores culturais,
+        - tendências de mercado já indicadas em outros trechos da análise.
+
+      Não transforme o texto em uma lista solta de dores; organize a narrativa por grupos de clientes ou eixos de necessidade.
+
+      3. Exigências BRDE para o item 2.3
+
+      Você deve estruturar o texto de modo que:
+
+      - Fique claro **por que a SCine é necessária** do ponto de vista de política de crédito:
+        - há um problema bem definido (lacuna de oferta/estrutura),
+        - há uma oportunidade consistente (mercado e demanda reais),
+        - a solução proposta é adequada ao contexto regional.
+      - Fique evidente que existe **espaço de mercado não ocupado** (ou mal atendido) pelos grandes players de streaming:
+        - especialmente na combinação de OTT regional, HUB físico, Van 4K e foco em economia criativa de Santa Catarina.
+      - Aponte que essas necessidades e oportunidades ajudam a:
+        - reduzir o risco de inadimplência (porque existe demanda estruturada),
+        - justificar as projeções de assinantes, eventos e contratos B2B/B2G que sustentam o plano financeiro.
+
+      Evite linguagem excessivamente promocional; o foco é mostrar lógica de mercado e aderência da solução.
+
+      4. Ordem de busca de informações (uso interno, não deve aparecer no texto)
+
+      Para construir o texto do item 2.3, siga esta ordem interna:
+
+      - Primeiro, leia a STRATEGIC_MATRIX_SCINE, principalmente:
+        - valueProposition (quais dores e benefícios já foram mapeados),
+        - customerSegments (quem são os públicos afetados por essas dores),
+        - swot.strengths e swot.opportunities (oportunidades mapeadas e como a SCine se posiciona).
+      - Use esses campos para entender:
+        - quais problemas são citados com mais frequência,
+        - quais oportunidades estratégicas já foram identificadas,
+        - como a proposta de valor se conecta a estes pontos.
+      - Em seguida, refine a análise consultando os documentos internos:
+        - análise de mercado,
+        - resultados de pesquisa com público/gestores/produtores,
+        - documentos de “revisão e novas ideias”,
+        - plano de marketing antigo (como referência histórica).
+      - No texto final:
+        - NÃO mencione “STRATEGIC_MATRIX_SCINE”, nomes de arquivos, planilhas ou PDFs.
+        - Fale genericamente em “pesquisas realizadas”, “estudos de mercado” e “análises internas”.
+      - Se perceber lacunas (por exemplo, não há dados concretos para uma dor citada):
+        - não invente números ou fatos,
+        - descreva apenas aquilo que está embasado,
+        - mantenha o texto em nível de análise qualitativa, sem prometer dados que não existem.
+
+      5. Estrutura sugerida para o texto final (2.3)
+
+      Organize o texto final em 3 a 5 parágrafos:
+
+      - Parágrafo 1 – Apresente, de forma geral, quais são os grandes problemas/necessidades do mercado em que a SCine atua (público final, produtores, prefeituras, festivais).
+      - Parágrafo 2 – Detalhe as principais dores dos clientes B2C (assinantes): acesso a conteúdo regional, identificação cultural, preço, experiência de uso, distância entre produção e público.
+      - Parágrafo 3 – Detalhe as dores e necessidades dos clientes B2B/B2G (prefeituras, festivais, empresas): visibilidade de eventos, estrutura técnica para transmissão, registro audiovisual profissional, estímulo à economia criativa.
+      - Parágrafo 4 – Apresente as oportunidades pouco exploradas que surgem a partir dessas dores (regionalização, HUB, Van 4K, acessibilidade, políticas culturais), mostrando por que a SCine se encaixa nesse espaço.
+      - Parágrafo 5 (opcional) – Faça a ponte com os próximos tópicos, indicando que essas necessidades e oportunidades serão quantificadas e conectadas a concorrência, tamanho de mercado e projeções.
+
+      Instrução final:
+      Com base em todas as regras acima, no contexto fornecido pelo usuário (documentos, notas) e nas informações consolidadas para a SCine, gere o texto final da seção 2.3 em português brasileiro, descrevendo as necessidades, problemas e oportunidades de forma clara, fundamentada e alinhada às exigências do SEBRAE e do BRDE.
+    `,
+},
   '2.4': {
     title: 'Pesquisa de Mercado Primária',
     sebrae: [
